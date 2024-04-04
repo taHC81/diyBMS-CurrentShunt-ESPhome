@@ -1,0 +1,346 @@
+esphome:
+  platform: ESP32
+  board: esp-wrover-kit
+  name: currentshunt
+  project:
+    name: "tahc81.fve-mon"
+    version: 1.0.0
+
+ota:
+logger:
+api:
+
+time:
+  - platform: sntp
+    id: sntp_time
+    timezone: Europe/Bratislava
+    servers:
+     - 0.pool.ntp.org
+     - 1.pool.ntp.org
+     - 2.pool.ntp.org
+    on_time:
+      - seconds: 0
+        minutes: 0
+        hours: 0
+        then:
+          - switch.toggle: shunt_reset_mah_out
+          - switch.toggle: shunt_reset_mah_in
+
+uart:
+  - id: modbus_0        # RS485: CurrentShunt (0x5A)
+    baud_rate: 19200
+    data_bits: 8
+    stop_bits: 1
+    parity: NONE
+    tx_pin: GPIO4
+    rx_pin: GPIO36
+
+modbus:
+  uart_id: modbus_0
+  id: modbus_esplan
+  send_wait_time: 1s
+
+modbus_controller:
+  - id: shunt
+    address: 90
+    modbus_id: modbus_esplan
+    update_interval: 5s
+
+switch:
+  - platform: modbus_controller
+    modbus_controller_id: shunt
+    id: shunt_reset_mah_out
+    address: 13
+    register_type: holding
+    internal: true
+
+  - platform: modbus_controller
+    modbus_controller_id: shunt
+    id: shunt_reset_mah_in
+    address: 15
+    register_type: holding
+    internal: true
+
+sensor:
+  - platform: template
+    name: "CurrentShunt Power"
+    id: currentshunt_power
+    device_class: power
+    unit_of_measurement: "W"
+    accuracy_decimals: 1
+    update_interval: 2s
+    lambda: |-
+      return id(currentshunt_voltage).state * id(currentshunt_current).state;
+
+  - platform: modbus_controller
+    modbus_controller_id: shunt
+    name: "CurrentShunt Voltage"
+    id: currentshunt_voltage
+    address: 0
+    register_type: holding
+    value_type: FP32_R
+    accuracy_decimals: 4
+    unit_of_measurement: V
+    device_class: voltage
+
+  - platform: modbus_controller
+    modbus_controller_id: shunt
+    name: "CurrentShunt Current"
+    id: currentshunt_current
+    address: 2
+    register_type: holding
+    value_type: FP32_R
+    accuracy_decimals: 4
+    unit_of_measurement: A
+    device_class: current
+  
+  - platform: modbus_controller
+    modbus_controller_id: shunt
+    name: "CurrentShunt INA228 die temperature"
+    address: 8
+    register_type: holding
+    value_type: U_WORD
+    unit_of_measurement: "°C"
+    device_class: temperature
+  
+  - platform: modbus_controller
+    modbus_controller_id: shunt
+    name: "CurrentShunt Power reg"
+    id: currentshunt_current_reg
+    address: 10
+    register_type: holding
+    value_type: FP32_R
+    accuracy_decimals: 4
+    unit_of_measurement: W
+    device_class: power
+    lambda: "if (id(currentshunt_current).state < 0) { return -x; } else { return x; }"
+  
+  - platform: modbus_controller
+    modbus_controller_id: shunt
+    name: "CurrentShunt mAh OUT"
+    id: cs_mah_out
+    address: 4
+    register_type: holding
+    value_type: U_DWORD
+    accuracy_decimals: 0
+    unit_of_measurement: mAh
+  
+  - platform: modbus_controller
+    modbus_controller_id: shunt
+    name: "CurrentShunt mAh IN"
+    id: cs_mah_in
+    address: 6
+    register_type: holding
+    value_type: U_DWORD
+    accuracy_decimals: 0
+    unit_of_measurement: mAh
+  
+  - platform: modbus_controller
+    modbus_controller_id: shunt
+    name: "CurrentShunt bitflag"
+    id: cs_bitflag
+    address: 9
+    register_type: holding
+    value_type: U_WORD
+    accuracy_decimals: 0
+  
+  - platform: modbus_controller
+    modbus_controller_id: shunt
+    name: "CurrentShunt mAh OUT daily"
+    id: cs_mah_out_daily
+    address: 12
+    register_type: holding
+    value_type: U_DWORD
+    accuracy_decimals: 0
+    unit_of_measurement: mAh
+  
+  - platform: modbus_controller
+    modbus_controller_id: shunt
+    name: "CurrentShunt mAh IN daily"
+    id: cs_mah_in_daily
+    address: 14
+    register_type: holding
+    value_type: U_DWORD
+    accuracy_decimals: 0
+    unit_of_measurement: mAh
+  
+  - platform: modbus_controller
+    modbus_controller_id: shunt
+    name: "CurrentShunt Shunt resistance"
+    id: cs_shunt_resistance
+    address: 16
+    register_type: holding
+    value_type: FP32_R
+    accuracy_decimals: 3
+    unit_of_measurement: mΩ
+  
+  - platform: modbus_controller
+    modbus_controller_id: shunt
+    name: "CurrentShunt Shunt max current"
+    id: cs_shunt_max_current
+    address: 18
+    register_type: holding
+    value_type: U_WORD
+    accuracy_decimals: 0
+    unit_of_measurement: A
+    device_class: current
+  
+  - platform: modbus_controller
+    modbus_controller_id: shunt
+    name: "CurrentShunt Shunt millivolt"
+    id: cs_shunt_millivolt
+    address: 19
+    register_type: holding
+    value_type: U_WORD
+    accuracy_decimals: 0
+    unit_of_measurement: mV
+    device_class: voltage
+  
+  - platform: modbus_controller
+    modbus_controller_id: shunt
+    name: "CurrentShunt Battery Capacity Ah"
+    id: cs_batterycapacity_amphour
+    address: 20
+    register_type: holding
+    value_type: U_WORD
+    accuracy_decimals: 0
+    unit_of_measurement: Ah
+  
+  - platform: modbus_controller
+    modbus_controller_id: shunt
+    name: "CurrentShunt Fully Charged Voltage"
+    id: cs_fully_charged_voltage
+    address: 21
+    register_type: holding
+    value_type: FP32_R
+    accuracy_decimals: 2
+    unit_of_measurement: V
+    device_class: voltage
+  
+  - platform: modbus_controller
+    modbus_controller_id: shunt
+    name: "CurrentShunt Tail Current"
+    id: cs_tail_current
+    address: 23
+    register_type: holding
+    value_type: FP32_R
+    accuracy_decimals: 2
+    unit_of_measurement: A
+    device_class: current
+  
+  - platform: modbus_controller
+    modbus_controller_id: shunt
+    name: "CurrentShunt Charge Efficiency Factor"
+    id: cs_charge_efficiency_factor
+    address: 25
+    register_type: holding
+    value_type: U_WORD
+    accuracy_decimals: 2
+    unit_of_measurement: "%"
+    device_class: battery
+    filters:
+      - multiply: 0.01
+  
+  - platform: modbus_controller
+    modbus_controller_id: shunt
+    name: "CurrentShunt State of Charge"
+    id: cs_soc
+    address: 26
+    register_type: holding
+    value_type: U_WORD
+    accuracy_decimals: 2
+    unit_of_measurement: "%"
+    device_class: battery
+    filters:
+      - multiply: 0.01
+
+number:
+  - platform: modbus_controller
+    modbus_controller_id: shunt
+    id: shunt_max_current
+    name: "shunt_max_current"
+    address: 18
+    value_type: U_WORD
+    unit_of_measurement: "A"
+    min_value: 5
+    max_value: 1000
+    step: 1
+    mode: box
+
+  - platform: modbus_controller
+    modbus_controller_id: shunt
+    id: shunt_millivolt 
+    name: "shunt_millivolt"
+    address: 19
+    value_type: U_WORD
+    unit_of_measurement: "mV"
+    min_value: 5
+    max_value: 200
+    step: 1
+    mode: box
+  
+  - platform: modbus_controller
+    modbus_controller_id: shunt
+    id: battery_capacity 
+    name: "Battery Capacity"
+    address: 20
+    value_type: U_WORD
+    unit_of_measurement: "Ah"
+    min_value: 50
+    max_value: 1000
+    step: 1
+    mode: box
+  
+  - platform: modbus_controller
+    modbus_controller_id: shunt
+    id: fully_charged_voltage 
+    name: "Fully charged voltage"
+    address: 21
+    value_type: FP32_R
+    unit_of_measurement: "V"
+    min_value: 48
+    max_value: 60
+    step: 0.1
+    mode: box
+  
+  - platform: modbus_controller
+    modbus_controller_id: shunt
+    id: shunt_tail_current
+    name: "Tail Current"
+    address: 23
+    value_type: FP32_R
+    unit_of_measurement: "A"
+    min_value: 0
+    max_value: 100
+    step: 1
+    mode: box
+  
+  - platform: modbus_controller
+    modbus_controller_id: shunt
+    id: shunt_charge_efficiency
+    name: "Charge Efficiency"
+    address: 25
+    value_type: U_WORD
+    unit_of_measurement: "%"
+    min_value: 0
+    max_value: 100
+    step: 0.1
+    mode: box
+    lambda: "return x * 0.01; "
+    write_lambda: |-
+      return x * 100 ;
+  
+  - platform: modbus_controller
+    modbus_controller_id: shunt
+    id: shunt_soc_num
+    name: "State of Charge"
+    address: 26
+    value_type: U_WORD
+    unit_of_measurement: "%"
+    min_value: 0
+    max_value: 100
+    step: 0.01
+    mode: box
+    lambda: "return x * 0.01; "
+    write_lambda: |-
+      return x * 100 ;
