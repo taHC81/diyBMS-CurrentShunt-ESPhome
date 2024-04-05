@@ -1,11 +1,11 @@
 # Standalone implementation of diyBMS-CurrentShunt
 
-Excellent battery monitor ![diyBMS-CurretnShut by Stuart Pittaway](https://github.com/stuartpittaway/diyBMS-CurrentShunt) shall be used as a standalone device and integrated to a Home assistand with an ESPhome node using RS485 connection. Provided YAML configuration file includes all sensors and input numbers in order to configure CurretnShunt.
+Excellent battery monitor ![diyBMS-CurretnShut by Stuart Pittaway](https://github.com/stuartpittaway/diyBMS-CurrentShunt) shall be used as a standalone device and integrated to a Home assistant with an ESPhome node using RS485 connection. Provided YAML configuration file includes all sensors and input numbers in order to configure CurretnShunt.
 
 ## Notes
 - modbus configuration should be modified according to your needs
-- power is somehow strangely reported (invalid sign for low power readings), thus the template sensor (CurrentShunt Power reg) has been created
-- daily mAh is resetting at midnight, and also during 100% SoC calibration which happens on reaching Fully Charged Voltage and current lower than Tail Current for few minutes. I'd suggest to create Utility meter on HA side to have consistent values.
+- power is somehow strangely reported (invalid sign for low power readings), thus the template sensor (`CurrentShunt Power reg`) has been created
+- daily mAh is resetting at midnight, and also during 100% SoC calibration which happens on reaching `Fully Charged Voltage` and current lower than `Tail Current` for few minutes. I'd suggest to create [Utility meter](https://www.home-assistant.io/integrations/utility_meter/) on HA side to have consistent values.
 
 ## diyBMS-CurrentShunt
 ![HW](https://github.com/taHC81/diyBMS-CurrentShunt-ESPhome/blob/main/currentshunt.jpg?raw=true)
