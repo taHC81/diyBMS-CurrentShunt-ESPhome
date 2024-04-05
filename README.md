@@ -1,4 +1,4 @@
-# Standalone implementation of diyBMS-CurretnShut
+# Standalone implementation of diyBMS-CurrentShunt
 
 Excellent battery monitor ![diyBMS-CurretnShut by Stuart Pittaway](https://github.com/stuartpittaway/diyBMS-CurrentShunt) shall be used as a standalone device and integrated to a Home assistand with an ESPhome node using RS485 connection. Provided YAML configuration file includes all sensors and input numbers in order to configure CurretnShunt.
 
