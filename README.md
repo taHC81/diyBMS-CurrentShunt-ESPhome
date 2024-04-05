@@ -12,3 +12,6 @@ Excellent battery monitor ![diyBMS-CurretnShut by Stuart Pittaway](https://githu
 
 ## ESPhome / Home assistant entities
 ![HW](https://github.com/taHC81/diyBMS-CurrentShunt-ESPhome/blob/main/cs-entities.png?raw=true)
+
+## Youtube video
+[![Video](https://img.youtube.com/vi/P4SeWt5aov0/0.jpg)](https://www.youtube.com/watch?v=P4SeWt5aov0)
