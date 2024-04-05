@@ -5,3 +5,5 @@ Excellent battery monitor ![diyBMS-CurretnShut by Stuart Pittaway](https://githu
 ## diyBMS-CurrentShunt
 ![HW](https://github.com/taHC81/diyBMS-CurrentShunt-ESPhome/blob/main/currentshunt.jpg?raw=true)
 
+## ESPhome / Home assistant entities
+![HW](https://github.com/taHC81/diyBMS-CurrentShunt-ESPhome/blob/main/cs-entities.png?raw=true)
